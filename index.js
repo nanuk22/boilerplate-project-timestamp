@@ -32,22 +32,27 @@ var listener = app.listen(process.env.PORT, function() {
 });
 
 app.get("/api/:date?", function(req, res) {
-  let data = req.params.date;
-  let date;
-  if (Date.parse(data)) {
-    date = data;
+  let date = req.params.date;
+  if (Date.parse(date)) {
     req.timeStr = new Date(date).toUTCString();
     req.timeMs = new Date(date).getTime();
-  } else if (Number(data)) {
-    date = Number(data);
-    req.timeStr = new Date(date).toUTCString();
-    req.timeMs = new Date(date).getTime();
-  } else if (data == undefined) {
+    return res.json({ "unix": req.timeMs, "utc": req.timeStr });
+  }
+
+
+  if (Number(date)) {
+    const dateMs = Number(date);
+    req.timeStr = new Date(dateMs).toUTCString();
+    req.timeMs = new Date(dateMs).getTime();
+    return res.json({ "unix": req.timeMs, "utc": req.timeStr });
+  }
+
+  if (date === undefined) {
     req.timeStr = new Date().toUTCString();
     req.timeMs = new Date().getTime();
+    return res.json({ "unix": req.timeMs, "utc": req.timeStr });
   } else {
-    return res.json({ error : "Invalid Date" });
+    return res.json({ error: "Invalid Date" });
   }
-  res.json({ "unix": req.timeMs, "utc": req.timeStr });
 });
 
